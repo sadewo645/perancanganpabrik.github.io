@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-pO12H1G5n0WlH0I1GtIsfRSAxEPPGjBJOCa/MEGLjm+rXhN3kLBXjg5eQof8I4eAbOe+tfjV1kP9Wcv16O3EOQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="dark-body sidebar-collapsed">
+<body class="dark-body">
     <div class="layout">
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -25,9 +25,6 @@
         <div class="content-area">
             <header class="top-bar">
                 <div class="top-left">
-                    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle Sidebar" aria-expanded="false">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
                     <div class="top-logo">PKS</div>
                     <div class="top-title">Sistem Monitoring Pabrik Kelapa Sawit</div>
                 </div>
@@ -96,79 +93,79 @@
                         <div class="kpi-card" data-key="cod">
                             <div class="kpi-icon"><i class="fa-solid fa-water"></i></div>
                             <div class="kpi-label">COD rata-rata</div>
-                            <div class="kpi-value" id="kpi-cod">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">mg/L</div>
                         </div>
                         <div class="kpi-card" data-key="bod">
                             <div class="kpi-icon"><i class="fa-solid fa-droplet"></i></div>
                             <div class="kpi-label">BOD rata-rata</div>
-                            <div class="kpi-value" id="kpi-bod">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">mg/L</div>
                         </div>
                         <div class="kpi-card" data-key="tss">
                             <div class="kpi-icon"><i class="fa-solid fa-cloud"></i></div>
                             <div class="kpi-label">TSS rata-rata</div>
-                            <div class="kpi-value" id="kpi-tss">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">mg/L</div>
                         </div>
                         <div class="kpi-card" data-key="ph">
                             <div class="kpi-icon"><i class="fa-solid fa-flask"></i></div>
                             <div class="kpi-label">pH rata-rata</div>
-                            <div class="kpi-value" id="kpi-ph">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">pH</div>
                         </div>
                         <div class="kpi-card" data-key="temperature">
                             <div class="kpi-icon"><i class="fa-solid fa-temperature-half"></i></div>
                             <div class="kpi-label">Suhu rata-rata</div>
-                            <div class="kpi-value" id="kpi-temperature">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">°C</div>
                         </div>
                         <div class="kpi-card" data-key="overload">
                             <div class="kpi-icon"><i class="fa-solid fa-bolt"></i></div>
                             <div class="kpi-label">Overload</div>
-                            <div class="kpi-value" id="kpi-overload">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">%</div>
                         </div>
                         <div class="kpi-card" data-key="oer">
                             <div class="kpi-icon"><i class="fa-solid fa-percent"></i></div>
                             <div class="kpi-label">OER</div>
-                            <div class="kpi-value" id="kpi-oer">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">%</div>
                         </div>
                         <div class="kpi-card" data-key="ker">
                             <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
                             <div class="kpi-label">KER</div>
-                            <div class="kpi-value" id="kpi-ker">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">%</div>
                         </div>
                         <div class="kpi-card" data-key="energy">
                             <div class="kpi-icon"><i class="fa-solid fa-plug"></i></div>
                             <div class="kpi-label">Konsumsi energi</div>
-                            <div class="kpi-value" id="kpi-energy">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">kWh/ton</div>
                         </div>
                         <div class="kpi-card" data-key="sterilizerPressure">
                             <div class="kpi-icon"><i class="fa-solid fa-gauge-high"></i></div>
                             <div class="kpi-label">Tekanan Sterilizer</div>
-                            <div class="kpi-value" id="kpi-sterilizerPressure">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">bar</div>
                         </div>
                         <div class="kpi-card" data-key="boilerPressure">
                             <div class="kpi-icon"><i class="fa-solid fa-fire"></i></div>
                             <div class="kpi-label">Tekanan Boiler</div>
-                            <div class="kpi-value" id="kpi-boilerPressure">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">bar</div>
                         </div>
                         <div class="kpi-card" data-key="cpoLevel">
                             <div class="kpi-icon"><i class="fa-solid fa-oil-well"></i></div>
                             <div class="kpi-label">Level CPO Tank</div>
-                            <div class="kpi-value" id="kpi-cpoLevel">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">%</div>
                         </div>
                         <div class="kpi-card" data-key="moistureCpo">
                             <div class="kpi-icon"><i class="fa-solid fa-droplet"></i></div>
                             <div class="kpi-label">Moisture CPO</div>
-                            <div class="kpi-value" id="kpi-moistureCpo">0</div>
+                            <div class="kpi-value">0</div>
                             <div class="kpi-unit">%</div>
                         </div>
                     </div>

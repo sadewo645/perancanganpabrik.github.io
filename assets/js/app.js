@@ -1,3 +1,4 @@
+const kpiElements = document.querySelectorAll('.kpi-card');
 const kpiMap = {
     cod: { unit: 'mg/L', min: 150, max: 280 },
     bod: { unit: 'mg/L', min: 50, max: 140 },
@@ -13,36 +14,6 @@ const kpiMap = {
     cpoLevel: { unit: '%', min: 45, max: 95 },
     moistureCpo: { unit: '%', min: 0.15, max: 0.45 }
 };
-
-const neonLinePalette = ['rgba(99, 102, 241, 1)', 'rgba(236, 72, 153, 1)', 'rgba(110, 231, 183, 1)'];
-
-function ensureNeonGlowPlugin() {
-    if (window.__pksNeonGlowRegistered) return;
-    const neonGlow = {
-        id: 'neonGlow',
-        beforeDatasetDraw(chart, args) {
-            const ctx = chart.ctx;
-            ctx.save();
-            const dataset = chart.config.data.datasets[args.index];
-            ctx.shadowColor = dataset.borderColor || 'rgba(99, 102, 241, 0.6)';
-            ctx.shadowBlur = dataset.glowBlur ?? 18;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-        },
-        afterDatasetDraw(chart) {
-            chart.ctx.restore();
-        }
-    };
-    Chart.register(neonGlow);
-    window.__pksNeonGlowRegistered = true;
-}
-
-function withAlpha(color, alpha) {
-    if (color.startsWith('rgba')) {
-        return color.replace(/rgba\(([^)]+),\s*[^)]+\)/, `rgba($1, ${alpha})`);
-    }
-    return color;
-}
 
 const defaultWarningList = [
     'Tekanan Boiler > 40 bar',
@@ -78,9 +49,9 @@ function setStatus(isConnected) {
 }
 
 function createGradient(ctx, color) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height || 300);
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, color);
-    gradient.addColorStop(1, 'rgba(8, 10, 24, 0)');
+    gradient.addColorStop(1, 'rgba(10, 13, 26, 0.1)');
     return gradient;
 }
 
@@ -93,50 +64,32 @@ const chartConfig = {
             data: [],
             fill: true,
             tension: 0.35,
-            borderWidth: 2.4,
-            pointRadius: 4,
-            pointHoverRadius: 7,
-            pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-            pointBorderWidth: 1,
-            pointBorderColor: '#0a1026',
-            borderColor: 'rgba(99, 102, 241, 1)',
-            backgroundColor: 'rgba(99, 102, 241, 0.18)',
-            glowBlur: 20
+            borderWidth: 2,
+            pointRadius: 0,
+            borderColor: 'rgba(97, 176, 255, 0.95)',
+            backgroundColor: 'rgba(97, 176, 255, 0.18)',
+            shadowColor: 'rgba(97, 176, 255, 0.45)',
+            shadowBlur: 15
         }]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-            mode: 'nearest',
-            intersect: false
-        },
         plugins: {
             legend: {
                 labels: {
                     color: '#d7dcf5'
                 }
-            },
-            tooltip: {
-                enabled: true,
-                backgroundColor: 'rgba(20,20,50,0.85)',
-                borderColor: '#8B5CF6',
-                borderWidth: 1,
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                cornerRadius: 6,
-                padding: 10,
-                displayColors: false
             }
         },
         scales: {
             x: {
                 ticks: { color: '#9aa5c4' },
-                grid: { color: 'rgba(99, 102, 241, 0.12)' }
+                grid: { color: 'rgba(97, 176, 255, 0.08)' }
             },
             y: {
                 ticks: { color: '#9aa5c4' },
-                grid: { color: 'rgba(99, 102, 241, 0.12)' }
+                grid: { color: 'rgba(97, 176, 255, 0.08)' }
             }
         }
     }
@@ -145,21 +98,26 @@ const chartConfig = {
 const charts = {};
 
 function initCharts() {
-    ensureNeonGlowPlugin();
-    const chartKeys = ['ph', 'cod', 'sterilizer', 'digester', 'press', 'cpo', 'flow', 'energy'];
-    chartKeys.forEach((key, index) => {
+    const chartIds = {
+        ph: { color: 'rgba(97, 176, 255, 0.95)' },
+        cod: { color: 'rgba(187, 134, 252, 0.95)' },
+        sterilizer: { color: 'rgba(95, 255, 161, 0.95)' },
+        digester: { color: 'rgba(255, 166, 77, 0.95)' },
+        press: { color: 'rgba(255, 95, 135, 0.95)' },
+        cpo: { color: 'rgba(255, 208, 105, 0.95)' },
+        flow: { color: 'rgba(97, 255, 236, 0.95)' },
+        energy: { color: 'rgba(120, 190, 255, 0.95)' }
+    };
+
+    Object.entries(chartIds).forEach(([key, cfg]) => {
         const canvas = document.getElementById(`chart-${key}`);
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const color = neonLinePalette[index % neonLinePalette.length];
-        const gradient = createGradient(ctx, withAlpha(color, 0.55));
+        const gradient = createGradient(ctx, cfg.color);
         const config = JSON.parse(JSON.stringify(chartConfig));
-        const dataset = config.data.datasets[0];
-        dataset.borderColor = color;
-        dataset.pointBackgroundColor = color;
-        dataset.backgroundColor = gradient;
-        dataset.label = canvas.parentElement.querySelector('h3')?.textContent || dataset.label;
-        dataset.glowBlur = 22;
+        config.data.datasets[0].borderColor = cfg.color;
+        config.data.datasets[0].backgroundColor = gradient;
+        config.data.datasets[0].label = canvas.parentElement.querySelector('h3').textContent;
         charts[key] = new Chart(ctx, config);
     });
 }
@@ -172,7 +130,7 @@ function appendChartData(chartKey, value) {
     const now = new Date();
     const timeLabel = now.toLocaleTimeString('id-ID', { hour12: false });
     chart.data.labels.push(timeLabel);
-    chart.data.datasets[0].data.push(Number.parseFloat(value.toFixed(2)));
+    chart.data.datasets[0].data.push(value);
     if (chart.data.labels.length > 12) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
@@ -180,27 +138,24 @@ function appendChartData(chartKey, value) {
     chart.update('none');
 }
 
-function animateKPI(valueEl, newValue) {
-    if (!valueEl) return;
-    const numericValue = Number.parseFloat(newValue);
-    if (Number.isNaN(numericValue)) return;
-    const formatted = Number.parseFloat(numericValue.toFixed(2));
-    const card = valueEl.closest('.kpi-card');
+function animateKPI(element, newValue) {
+    const valueEl = element.querySelector('.kpi-value');
+    const numericValue = parseFloat(newValue.toFixed(2));
     valueEl.classList.add('animate');
-    if (card) card.classList.add('updated');
-    valueEl.textContent = formatted;
+    element.classList.add('updated');
+    valueEl.textContent = numericValue;
     setTimeout(() => {
         valueEl.classList.remove('animate');
-        if (card) card.classList.remove('updated');
+        element.classList.remove('updated');
     }, 600);
 }
 
 function updateKPIFromData(data) {
-    Object.keys(kpiMap).forEach((key) => {
-        const valueEl = document.getElementById(`kpi-${key}`);
-        if (!valueEl) return;
-        if (Object.prototype.hasOwnProperty.call(data, key) && typeof data[key] === 'number') {
-            animateKPI(valueEl, data[key]);
+    Object.entries(kpiMap).forEach(([key]) => {
+        const card = document.querySelector(`.kpi-card[data-key="${key}"]`);
+        if (!card) return;
+        if (key in data) {
+            animateKPI(card, data[key]);
         }
     });
 }
@@ -360,41 +315,8 @@ function setupInteractions() {
     });
 }
 
-function setupLayoutControls() {
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    if (!toggleBtn || !document.querySelector('.sidebar')) return;
-    const body = document.body;
-    let userOverride = false;
-
-    const setCollapsed = (collapsed) => {
-        body.classList.toggle('sidebar-collapsed', collapsed);
-        toggleBtn.setAttribute('aria-expanded', String(!collapsed));
-        toggleBtn.setAttribute('title', collapsed ? 'Tampilkan sidebar' : 'Sembunyikan sidebar');
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-            icon.className = collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left';
-        }
-    };
-
-    const handleResize = () => {
-        if (userOverride) return;
-        setCollapsed(window.innerWidth <= 1200);
-    };
-
-    setCollapsed(window.innerWidth <= 1200);
-
-    toggleBtn.addEventListener('click', () => {
-        userOverride = true;
-        const collapsed = body.classList.contains('sidebar-collapsed');
-        setCollapsed(!collapsed);
-    });
-
-    window.addEventListener('resize', handleResize);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     connectMQTT();
     setupInteractions();
-    setupLayoutControls();
     restartSimulation();
 });

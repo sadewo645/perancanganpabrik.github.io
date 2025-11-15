@@ -165,82 +165,6 @@ function setStatus(isConnected) {
     text.textContent = isConnected ? 'Connected' : 'Disconnected';
 }
 
-const neonLinePalette = ['rgba(99, 102, 241, 1)', 'rgba(236, 72, 153, 1)', 'rgba(110, 231, 183, 1)'];
-
-function ensureNeonGlowPlugin() {
-    if (window.__pksNeonGlowRegistered) return;
-    const neonGlow = {
-        id: 'neonGlow',
-        beforeDatasetDraw(chart, args) {
-            const ctx = chart.ctx;
-            ctx.save();
-            const dataset = chart.config.data.datasets[args.index];
-            ctx.shadowColor = dataset.borderColor || 'rgba(99, 102, 241, 0.6)';
-            ctx.shadowBlur = dataset.glowBlur ?? 18;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-        },
-        afterDatasetDraw(chart) {
-            chart.ctx.restore();
-        }
-    };
-    Chart.register(neonGlow);
-    window.__pksNeonGlowRegistered = true;
-}
-
-function withAlpha(color, alpha) {
-    if (color.startsWith('rgba')) {
-        return color.replace(/rgba\(([^)]+),\s*[^)]+\)/, `rgba($1, ${alpha})`);
-    }
-    return color;
-}
-
-const stationChartConfig = {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: '',
-            data: [],
-            fill: true,
-            tension: 0.35,
-            borderWidth: 2.4,
-            pointRadius: 4,
-            pointHoverRadius: 7,
-            pointBackgroundColor: 'rgba(99, 102, 241, 1)',
-            pointBorderWidth: 1,
-            pointBorderColor: '#0a1026',
-            glowBlur: 22
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: 'nearest',
-            intersect: false
-        },
-        plugins: {
-            legend: { labels: { color: '#d7dcf5' } },
-            tooltip: {
-                enabled: true,
-                backgroundColor: 'rgba(20,20,50,0.85)',
-                borderColor: '#8B5CF6',
-                borderWidth: 1,
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                cornerRadius: 6,
-                padding: 10,
-                displayColors: false
-            }
-        },
-        scales: {
-            x: { ticks: { color: '#9aa5c4' }, grid: { color: 'rgba(99, 102, 241, 0.12)' } },
-            y: { ticks: { color: '#9aa5c4' }, grid: { color: 'rgba(99, 102, 241, 0.12)' } }
-        }
-    }
-};
-
 function createStationSection(key, config) {
     const section = document.createElement('section');
     section.className = 'station-section';
@@ -255,8 +179,8 @@ function createStationSection(key, config) {
             ${config.metrics.map(metric => `
                 <div class="station-card" data-key="${metric.key}">
                     <div class="label">${metric.label}</div>
-                    <div class="value" id="${key}-${metric.key}-value">0</div>
-                    ${metric.unit ? `<div class="unit">${metric.unit}</div>` : ''}
+                    <div class="value">0</div>
+                    <div class="unit">${metric.unit}</div>
                 </div>
             `).join('')}
         </div>
@@ -281,12 +205,10 @@ const chartInstances = {};
 
 function initStations() {
     if (!stationContainer) return;
-    ensureNeonGlowPlugin();
-    Object.entries(stationConfigs).forEach(([key, config], index) => {
+    Object.entries(stationConfigs).forEach(([key, config]) => {
         const section = createStationSection(key, config);
         stationContainer.appendChild(section);
-        const color = neonLinePalette[index % neonLinePalette.length];
-        createStationChart(key, config.chartLabel, color);
+        createStationChart(key, config.chartLabel);
         populateSampleTable(key, config.tableHeaders);
     });
 }
@@ -313,24 +235,44 @@ function filterStations(value) {
 }
 
 function createGradient(ctx, color) {
-    const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height || 260);
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
     gradient.addColorStop(0, color);
-    gradient.addColorStop(1, 'rgba(8, 10, 24, 0)');
+    gradient.addColorStop(1, 'rgba(10, 13, 26, 0.05)');
     return gradient;
 }
 
-function createStationChart(key, label, color) {
+function createStationChart(key, label) {
     const canvas = document.getElementById(`chart-${key}`);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const gradient = createGradient(ctx, withAlpha(color, 0.55));
-    const config = JSON.parse(JSON.stringify(stationChartConfig));
-    const dataset = config.data.datasets[0];
-    dataset.label = label;
-    dataset.borderColor = color;
-    dataset.pointBackgroundColor = color;
-    dataset.backgroundColor = gradient;
-    chartInstances[key] = new Chart(ctx, config);
+    const color = 'rgba(97, 176, 255, 0.95)';
+    const gradient = createGradient(ctx, color);
+    chartInstances[key] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label,
+                data: [],
+                borderColor: color,
+                backgroundColor: gradient,
+                borderWidth: 2,
+                tension: 0.35,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#d7dcf5' } }
+            },
+            scales: {
+                x: { ticks: { color: '#9aa5c4' }, grid: { color: 'rgba(97, 176, 255, 0.08)' } },
+                y: { ticks: { color: '#9aa5c4' }, grid: { color: 'rgba(97, 176, 255, 0.08)' } }
+            }
+        }
+    });
 }
 
 function populateSampleTable(key, headers) {
@@ -381,40 +323,21 @@ function generateSampleCell(stationKey, header, index, rowIndex) {
 }
 
 function updateStationMetrics(key, data) {
-    const config = stationConfigs[key];
-    if (!config) return;
-    config.metrics.forEach((metric) => {
-        const valueEl = document.getElementById(`${key}-${metric.key}-value`);
-        if (!valueEl) return;
-        let displayValue = '-';
-
+    const section = document.querySelector(`.station-section[data-station="${key}"]`);
+    if (!section) return;
+    stationConfigs[key].metrics.forEach((metric) => {
+        const card = section.querySelector(`.station-card[data-key="${metric.key}"]`);
+        if (!card) return;
+        const valueEl = card.querySelector('.value');
         if (metric.values) {
-            const provided = data[metric.key];
-            if (typeof provided === 'string') {
-                displayValue = provided;
-            } else {
-                const index = Math.round(Math.random());
-                displayValue = metric.values[index];
-            }
+            const index = Math.round(Math.random());
+            valueEl.textContent = metric.values[index];
         } else {
-            const rawValue = data[metric.key] ?? (metric.min + Math.random() * (metric.max - metric.min));
-            const numeric = Number.parseFloat(rawValue);
-            if (!Number.isNaN(numeric)) {
-                const decimals = metric.unit === 'menit' || metric.unit === '' ? 0 : 2;
-                displayValue = Number.parseFloat(numeric.toFixed(decimals));
-            } else if (typeof rawValue === 'string') {
-                displayValue = rawValue;
-            }
+            const value = data[metric.key] ?? metric.min + Math.random() * (metric.max - metric.min);
+            valueEl.textContent = Number.parseFloat(value).toFixed(metric.unit === 'menit' || metric.unit === '' ? 0 : 2);
         }
-
-        valueEl.textContent = displayValue;
-        valueEl.classList.add('animate');
-        const card = valueEl.closest('.station-card');
-        if (card) card.classList.add('updated');
-        setTimeout(() => {
-            valueEl.classList.remove('animate');
-            if (card) card.classList.remove('updated');
-        }, 600);
+        card.classList.add('updated');
+        setTimeout(() => card.classList.remove('updated'), 600);
     });
 }
 
@@ -423,9 +346,7 @@ function appendStationChart(key, value) {
     if (!chart) return;
     const now = new Date();
     chart.data.labels.push(now.toLocaleTimeString('id-ID', { hour12: false }));
-    const numeric = Number.parseFloat(value);
-    if (Number.isNaN(numeric)) return;
-    chart.data.datasets[0].data.push(Number.parseFloat(numeric.toFixed(2)));
+    chart.data.datasets[0].data.push(value);
     if (chart.data.labels.length > 12) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
@@ -516,40 +437,7 @@ function stopSimulation() {
     }
 }
 
-function setupLayoutControls() {
-    const toggleBtn = document.getElementById('sidebar-toggle');
-    if (!toggleBtn || !document.querySelector('.sidebar')) return;
-    const body = document.body;
-    let userOverride = false;
-
-    const setCollapsed = (collapsed) => {
-        body.classList.toggle('sidebar-collapsed', collapsed);
-        toggleBtn.setAttribute('aria-expanded', String(!collapsed));
-        toggleBtn.setAttribute('title', collapsed ? 'Tampilkan sidebar' : 'Sembunyikan sidebar');
-        const icon = toggleBtn.querySelector('i');
-        if (icon) {
-            icon.className = collapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left';
-        }
-    };
-
-    const handleResize = () => {
-        if (userOverride) return;
-        setCollapsed(window.innerWidth <= 1200);
-    };
-
-    setCollapsed(window.innerWidth <= 1200);
-
-    toggleBtn.addEventListener('click', () => {
-        userOverride = true;
-        const collapsed = body.classList.contains('sidebar-collapsed');
-        setCollapsed(!collapsed);
-    });
-
-    window.addEventListener('resize', handleResize);
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     connectMQTT();
-    setupLayoutControls();
     startSimulation();
 });
