@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Monitoring Pabrik Kelapa Sawit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-pO12H1G5n0WlH0I1GtIsfRSAxEPPGjBJOCa/MEGLjm+rXhN3kLBXjg5eQof8I4eAbOe+tfjV1kP9Wcv16O3EOQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="dark-body">
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">PKS</span>
+                <span class="sidebar-title">Monitoring PKS & Kebun</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active"><i class="fa-solid fa-gauge"></i><span>Dashboard</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-seedling"></i><span>Monitoring Perkebunan</span></a>
+                <a href="monitoring-pabrik.html" class="nav-item"><i class="fa-solid fa-industry"></i><span>Monitoring Pabrik</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-building"></i><span>Monitoring Perusahaan</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-book-open"></i><span>Panduan Budidaya</span></a>
+            </nav>
+        </aside>
+        <div class="content-area">
+            <header class="top-bar">
+                <div class="top-left">
+                    <div class="top-logo">PKS</div>
+                    <div class="top-title">Sistem Monitoring Pabrik Kelapa Sawit</div>
+                </div>
+                <div class="top-right">
+                    <div class="status-indicator" id="mqtt-status">
+                        <span class="status-dot disconnected"></span>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                    <div class="top-clock" id="digital-clock">00:00:00</div>
+                </div>
+            </header>
+            <main class="main-content">
+                <section class="filters-section card">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="station-filter">Stasiun</label>
+                            <select id="station-filter" class="input-control">
+                                <option>Semua</option>
+                                <option>Sterilizer</option>
+                                <option>Press</option>
+                                <option>Boiler</option>
+                                <option>Clarification</option>
+                                <option>Kernel</option>
+                                <option>Turbin</option>
+                                <option>POME</option>
+                                <option>Weighbridge</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="start-date">Tanggal Mulai</label>
+                            <input type="date" id="start-date" class="input-control">
+                        </div>
+                        <div class="filter-group">
+                            <label for="end-date">Tanggal Akhir</label>
+                            <input type="date" id="end-date" class="input-control">
+                        </div>
+                        <div class="filter-group search-group">
+                            <label for="ai-search">AI Natural Language Search</label>
+                            <div class="search-wrapper">
+                                <input type="text" id="ai-search" class="input-control" placeholder="Contoh: Tampilkan tekanan boiler hari ini">
+                                <button class="btn btn-glow" id="ai-search-btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Cari</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filters-actions">
+                        <button class="btn btn-glow" id="reload-btn"><i class="fa-solid fa-rotate"></i> Muat Ulang Data</button>
+                        <button class="btn btn-glow" id="add-data-btn"><i class="fa-solid fa-plus"></i> Tambah Data</button>
+                        <button class="btn btn-glow" id="filter-date-btn"><i class="fa-solid fa-filter"></i> Terapkan Filter</button>
+                    </div>
+                </section>
+
+                <section class="alerts-section">
+                    <div class="alert-card">
+                        <h3><i class="fa-solid fa-triangle-exclamation"></i> Peringatan Otomatis</h3>
+                        <ul id="warning-list">
+                            <li>Tekanan Boiler &gt; 40 bar</li>
+                            <li>pH kolam limbah &lt; 6.0</li>
+                            <li>Motor Press Overload</li>
+                            <li>Turbin OFF / Trip</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="kpi-section">
+                    <div class="kpi-grid">
+                        <div class="kpi-card" data-key="cod">
+                            <div class="kpi-icon"><i class="fa-solid fa-water"></i></div>
+                            <div class="kpi-label">COD rata-rata</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">mg/L</div>
+                        </div>
+                        <div class="kpi-card" data-key="bod">
+                            <div class="kpi-icon"><i class="fa-solid fa-droplet"></i></div>
+                            <div class="kpi-label">BOD rata-rata</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">mg/L</div>
+                        </div>
+                        <div class="kpi-card" data-key="tss">
+                            <div class="kpi-icon"><i class="fa-solid fa-cloud"></i></div>
+                            <div class="kpi-label">TSS rata-rata</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">mg/L</div>
+                        </div>
+                        <div class="kpi-card" data-key="ph">
+                            <div class="kpi-icon"><i class="fa-solid fa-flask"></i></div>
+                            <div class="kpi-label">pH rata-rata</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">pH</div>
+                        </div>
+                        <div class="kpi-card" data-key="temperature">
+                            <div class="kpi-icon"><i class="fa-solid fa-temperature-half"></i></div>
+                            <div class="kpi-label">Suhu rata-rata</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">°C</div>
+                        </div>
+                        <div class="kpi-card" data-key="overload">
+                            <div class="kpi-icon"><i class="fa-solid fa-bolt"></i></div>
+                            <div class="kpi-label">Overload</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">%</div>
+                        </div>
+                        <div class="kpi-card" data-key="oer">
+                            <div class="kpi-icon"><i class="fa-solid fa-percent"></i></div>
+                            <div class="kpi-label">OER</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">%</div>
+                        </div>
+                        <div class="kpi-card" data-key="ker">
+                            <div class="kpi-icon"><i class="fa-solid fa-chart-line"></i></div>
+                            <div class="kpi-label">KER</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">%</div>
+                        </div>
+                        <div class="kpi-card" data-key="energy">
+                            <div class="kpi-icon"><i class="fa-solid fa-plug"></i></div>
+                            <div class="kpi-label">Konsumsi energi</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">kWh/ton</div>
+                        </div>
+                        <div class="kpi-card" data-key="sterilizerPressure">
+                            <div class="kpi-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                            <div class="kpi-label">Tekanan Sterilizer</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">bar</div>
+                        </div>
+                        <div class="kpi-card" data-key="boilerPressure">
+                            <div class="kpi-icon"><i class="fa-solid fa-fire"></i></div>
+                            <div class="kpi-label">Tekanan Boiler</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">bar</div>
+                        </div>
+                        <div class="kpi-card" data-key="cpoLevel">
+                            <div class="kpi-icon"><i class="fa-solid fa-oil-well"></i></div>
+                            <div class="kpi-label">Level CPO Tank</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">%</div>
+                        </div>
+                        <div class="kpi-card" data-key="moistureCpo">
+                            <div class="kpi-icon"><i class="fa-solid fa-droplet"></i></div>
+                            <div class="kpi-label">Moisture CPO</div>
+                            <div class="kpi-value">0</div>
+                            <div class="kpi-unit">%</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="charts-section">
+                    <h2 class="section-title">Tren Real-Time</h2>
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3>Tren pH per Stasiun</h3>
+                            <canvas id="chart-ph"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren COD (mg/L)</h3>
+                            <canvas id="chart-cod"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren Tekanan Sterilizer</h3>
+                            <canvas id="chart-sterilizer"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren Suhu Digester</h3>
+                            <canvas id="chart-digester"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren Arus Motor Press</h3>
+                            <canvas id="chart-press"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren Level Tanki CPO</h3>
+                            <canvas id="chart-cpo"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren Flowmeter Minyak / Air</h3>
+                            <canvas id="chart-flow"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Tren Konsumsi Energi</h3>
+                            <canvas id="chart-energy"></canvas>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js" integrity="sha512-t9N6byN1Nsx3Rp3XIan+FJxuxMxDPZWS9Vyuk3F7S3w7Dnk3a1JpN96CBvs1+qsSVqSdz+CA0nVddOZXS6AMDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
