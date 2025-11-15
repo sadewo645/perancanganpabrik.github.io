@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Pabrik PKS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-pO12H1G5n0WlH0I1GtIsfRSAxEPPGjBJOCa/MEGLjm+rXhN3kLBXjg5eQof8I4eAbOe+tfjV1kP9Wcv16O3EOQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="dark-body sidebar-collapsed">
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">PKS</span>
+                <span class="sidebar-title">Monitoring PKS & Kebun</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item"><i class="fa-solid fa-gauge"></i><span>Dashboard</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-seedling"></i><span>Monitoring Perkebunan</span></a>
+                <a href="monitoring-pabrik.html" class="nav-item active"><i class="fa-solid fa-industry"></i><span>Monitoring Pabrik</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-building"></i><span>Monitoring Perusahaan</span></a>
+                <a href="#" class="nav-item"><i class="fa-solid fa-book-open"></i><span>Panduan Budidaya</span></a>
+            </nav>
+        </aside>
+        <div class="content-area">
+            <header class="top-bar">
+                <div class="top-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle Sidebar" aria-expanded="false">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <div class="top-logo">PKS</div>
+                    <div class="top-title">Sistem Monitoring Pabrik Kelapa Sawit</div>
+                </div>
+                <div class="top-right">
+                    <div class="status-indicator" id="mqtt-status">
+                        <span class="status-dot disconnected"></span>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                    <div class="top-clock" id="digital-clock">00:00:00</div>
+                </div>
+            </header>
+            <main class="main-content">
+                <section class="filters-section card">
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label for="station-detail-filter">Stasiun</label>
+                            <select id="station-detail-filter" class="input-control">
+                                <option value="all">Semua Stasiun</option>
+                                <option value="weighbridge">Weighbridge</option>
+                                <option value="sterilizer">Sterilizer</option>
+                                <option value="thresher">Thresher</option>
+                                <option value="digester">Digester</option>
+                                <option value="press">Press</option>
+                                <option value="clarification">Clarification</option>
+                                <option value="kernel">Kernel Plant</option>
+                                <option value="boiler">Boiler</option>
+                                <option value="power">Power Plant</option>
+                                <option value="wtp">WTP</option>
+                                <option value="pome">POME / Biogas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="detail-start-date">Tanggal Mulai</label>
+                            <input type="date" id="detail-start-date" class="input-control">
+                        </div>
+                        <div class="filter-group">
+                            <label for="detail-end-date">Tanggal Akhir</label>
+                            <input type="date" id="detail-end-date" class="input-control">
+                        </div>
+                    </div>
+                    <div class="filters-actions">
+                        <button class="btn btn-glow" id="detail-reload-btn"><i class="fa-solid fa-rotate"></i> Muat Ulang Data</button>
+                        <button class="btn btn-glow" id="detail-export-btn"><i class="fa-solid fa-file-export"></i> Ekspor Laporan</button>
+                    </div>
+                </section>
+
+                <section class="station-sections" id="station-sections">
+                    <!-- Sections injected by JS -->
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.1.0/mqttws31.min.js" integrity="sha512-t9N6byN1Nsx3Rp3XIan+FJxuxMxDPZWS9Vyuk3F7S3w7Dnk3a1JpN96CBvs1+qsSVqSdz+CA0nVddOZXS6AMDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="assets/js/monitoring-pabrik.js"></script>
+</body>
+</html>
